@@ -97,6 +97,7 @@ left_panel, center_panel, right_panel = panels()
 
 # ---------- LEFT PANEL ----------
 def render_left():
+    # ---------- Upgrade Card for Free Users ----------
     if not st.session_state.premium:
         st.markdown(f"""
 <div class="card">
@@ -112,12 +113,22 @@ def render_left():
 </a>
 </div>
 """, unsafe_allow_html=True)
-    st.markdown("""
-<div class="card">
-<h4>📢 Ads</h4>
-Place Adsense Here
-</div>
-""", unsafe_allow_html=True)
+    
+    # ---------- AdSense Card ----------
+    st.markdown('<div class="card"><h4>📢 Sponsored</h4></div>', unsafe_allow_html=True)
+    
+    # Embed the AdSense code inside the card
+    components.html("""
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-4128082001934890"
+         data-ad-slot="1234567890"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    """, height=250)
 
 # ---------- RIGHT PANEL ----------
 def render_right():
@@ -229,3 +240,4 @@ if right_panel:
 if not left_panel:
     render_left()
     render_right()
+
