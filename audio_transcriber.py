@@ -98,9 +98,9 @@ left_panel, center_panel, right_panel = panels()
 
 # ---------- LEFT PANEL ----------
 def render_left():
-    # Upgrade card (only for free users)
+    # ---------- Upgrade Card ----------
     if not st.session_state.premium:
-        st.markdown("""
+        components.html("""
 <div class="card">
 <h4>💎 Upgrade to Premium</h4>
 <ul>
@@ -113,16 +113,12 @@ def render_left():
 <button style="width:100%;padding:12px;border-radius:12px;border:none;background:#2563eb;color:white;">Upgrade 🚀</button>
 </a>
 </div>
-""", unsafe_allow_html=True)
+""", height=250, scrolling=False)
 
-    # AdSense card
-    st.markdown('<div class="card"><h4>📢 Sponsored</h4></div>', unsafe_allow_html=True)
-
-    # Embed actual AdSense
+    # ---------- AdSense Card ----------
     components.html("""
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4128082001934890"
-     crossorigin="anonymous"></script>
-<!-- LeftPanelAd -->
+<div class="card">
+<h4>📢 Sponsored</h4>
 <ins class="adsbygoogle"
      style="display:block"
      data-ad-client="ca-pub-4128082001934890"
@@ -132,7 +128,8 @@ def render_left():
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-""", height=250)
+</div>
+""", height=300, scrolling=False)
 
 # ---------- RIGHT PANEL ----------
 def render_right():
@@ -244,6 +241,7 @@ if right_panel:
 if not left_panel:
     render_left()
     render_right()
+
 
 
 
