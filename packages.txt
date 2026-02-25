@@ -1,2 +1,5 @@
-ffmpeg
-libgl1
+streamlit
+faster-whisper
+pandas
+numpy
+plotly
