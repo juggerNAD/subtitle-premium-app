@@ -3,6 +3,7 @@ from faster_whisper import WhisperModel
 import tempfile
 import pandas as pd
 import plotly.graph_objects as go
+import streamlit.components.v1 as components
 
 # ---------- PAGE CONFIG ----------
 st.set_page_config(
@@ -97,7 +98,7 @@ left_panel, center_panel, right_panel = panels()
 
 # ---------- LEFT PANEL ----------
 def render_left():
-    # ---------- Upgrade Card for Free Users ----------
+    # Upgrade card
     if not st.session_state.premium:
         st.markdown(f"""
 <div class="card">
@@ -113,11 +114,9 @@ def render_left():
 </a>
 </div>
 """, unsafe_allow_html=True)
-    
-    # ---------- AdSense Card ----------
+
+    # AdSense card
     st.markdown('<div class="card"><h4>📢 Sponsored</h4></div>', unsafe_allow_html=True)
-    
-    # Embed the AdSense code inside the card
     components.html("""
     <ins class="adsbygoogle"
          style="display:block"
@@ -240,4 +239,5 @@ if right_panel:
 if not left_panel:
     render_left()
     render_right()
+
 
