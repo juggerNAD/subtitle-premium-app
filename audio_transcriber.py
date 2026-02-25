@@ -3,7 +3,6 @@ from faster_whisper import WhisperModel
 import tempfile
 import pandas as pd
 import plotly.graph_objects as go
-import streamlit.components.v1 as components
 
 # ---------- PAGE CONFIG ----------
 st.set_page_config(
@@ -98,10 +97,9 @@ left_panel, center_panel, right_panel = panels()
 
 # ---------- LEFT PANEL ----------
 def render_left():
-    # ---------- Upgrade Card ----------
     if not st.session_state.premium:
-        components.html("""
-<div style="background:#1f2937;padding:20px;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.6);margin-bottom:15px;">
+        st.markdown(f"""
+<div class="card">
 <h4>💎 Upgrade to Premium</h4>
 <ul>
 <li>Unlimited Transcriptions</li>
@@ -113,23 +111,13 @@ def render_left():
 <button style="width:100%;padding:12px;border-radius:12px;border:none;background:#2563eb;color:white;">Upgrade 🚀</button>
 </a>
 </div>
-""", height=250, scrolling=False)
-
-    # ---------- AdSense Card ----------
-    components.html("""
-<div style="background:#1f2937;padding:20px;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.6);margin-bottom:15px;">
-<h4>📢 Sponsored</h4>
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-4128082001934890"
-     data-ad-slot="7666553518"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+""", unsafe_allow_html=True)
+    st.markdown("""
+<div class="card">
+<h4>📢 Ads</h4>
+Place Adsense Here
 </div>
-""", height=300, scrolling=False)
+""", unsafe_allow_html=True)
 
 # ---------- RIGHT PANEL ----------
 def render_right():
@@ -241,8 +229,3 @@ if right_panel:
 if not left_panel:
     render_left()
     render_right()
-
-
-
-
-
