@@ -1,5 +1,2 @@
-streamlit
-faster-whisper
-pandas
-numpy
-plotly
+ffmpeg
+
