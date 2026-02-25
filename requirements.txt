@@ -1,8 +1,5 @@
-streamlit
-openai-whisper
-ffmpeg-python
-numpy
+streamlit>=1.26.0
+faster-whisper
 pandas
+numpy
 plotly
-pydub
-torch
