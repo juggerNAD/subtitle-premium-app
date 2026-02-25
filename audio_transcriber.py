@@ -101,7 +101,7 @@ def render_left():
     # ---------- Upgrade Card ----------
     if not st.session_state.premium:
         components.html("""
-<div class="card">
+<div style="background:#1f2937;padding:20px;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.6);margin-bottom:15px;">
 <h4>💎 Upgrade to Premium</h4>
 <ul>
 <li>Unlimited Transcriptions</li>
@@ -117,7 +117,7 @@ def render_left():
 
     # ---------- AdSense Card ----------
     components.html("""
-<div class="card">
+<div style="background:#1f2937;padding:20px;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.6);margin-bottom:15px;">
 <h4>📢 Sponsored</h4>
 <ins class="adsbygoogle"
      style="display:block"
@@ -241,6 +241,7 @@ if right_panel:
 if not left_panel:
     render_left()
     render_right()
+
 
 
 
