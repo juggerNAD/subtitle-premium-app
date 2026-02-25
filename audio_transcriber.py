@@ -318,97 +318,67 @@ data-full-width-responsive="true"></ins>
 # CENTER PANEL
 # =========================
 
-with center:
+with center_panel:
 
+    # ---------- Upload Card ----------
+    st.markdown('<div class="card">', unsafe_allow_html=True)
 
-    uploaded_file=st.file_uploader(
-    "Upload Audio",
-    type=["mp3","wav","m4a","mp4"]
+    uploaded_file = st.file_uploader(
+        "🎵 Drag & Drop Audio",
+        type=["mp3","wav","m4a","mp4"]
     )
 
+    st.markdown('</div>', unsafe_allow_html=True)
 
+    # ---------- Audio Preview ----------
     if uploaded_file:
 
-        size=uploaded_file.size/1024/1024
-
-        if size>MAX_MB:
-
-            st.error("File too large for your plan")
-            st.stop()
-
+        st.markdown('<div class="card">', unsafe_allow_html=True)
 
         st.audio(uploaded_file)
 
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        # FREE LIMIT
+        # ---------- Settings Card ----------
+        st.markdown('<div class="card">', unsafe_allow_html=True)
 
-        if not st.session_state.premium:
+        col1,col2 = st.columns(2)
 
-            if st.session_state.usage>=FREE_LIMIT:
+        with col1:
 
-                st.error("Free limit reached")
+            model_size = st.selectbox(
+                "Whisper Model",
+                allowed_models
+            )
 
-                st.warning("Upgrade to continue")
+        with col2:
 
-                st.stop()
+            format_choice = st.selectbox(
+                "Subtitle Format",
+                ["srt","lrc","ass"]
+            )
 
+        st.markdown('</div>', unsafe_allow_html=True)
 
+        # ---------- Generate ----------
         if st.button("Generate Subtitles"):
 
-            progress=st.progress(0)
-
+            progress = st.progress(0)
 
             with tempfile.NamedTemporaryFile(delete=False) as tmp:
 
                 tmp.write(uploaded_file.read())
-
-                path=tmp.name
-
+                path = tmp.name
 
             progress.progress(30)
 
-
-            segments,_=model.transcribe(path)
+            segments,_ = model.transcribe(path)
 
             segments=list(segments)
 
-
-            progress.progress(80)
-
-
-            subtitles=[
-
-            [seg.start,seg.end,seg.text]
-
-            for seg in segments
-
-            ]
-
-
             progress.progress(100)
 
-
-            st.session_state.usage+=1
-
-            st.session_state.history.append(uploaded_file.name)
-
-
-            st.markdown("### Subtitles")
-
-
-            for row in subtitles:
-
-                st.markdown(f"""
-
-<div class="subtitle-card">
-
-{row[2]}
-
-</div>
-
-""",unsafe_allow_html=True)
-
-
+            st.success("Subtitles Ready")
 
 # =========================
 # RIGHT PANEL
@@ -438,4 +408,5 @@ Adsense Ready
             st.write(h)
 
         st.markdown("</div>",unsafe_allow_html=True)
+
 
