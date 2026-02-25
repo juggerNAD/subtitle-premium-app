@@ -107,7 +107,7 @@ def render_left():
 <li>Long Audio Support</li>
 <li>Priority Processing</li>
 </ul>
-<a href="https://paypal.me/DonnaldBariso791/9.99?currency=USD" target="_blank">
+<a href="https://www.paypal.com/paypalme/DonnaldBariso791/699" target="_blank">
 <button style="width:100%;padding:12px;border-radius:12px;border:none;background:#2563eb;color:white;">Upgrade 🚀</button>
 </a>
 </div>
@@ -229,3 +229,4 @@ if right_panel:
 if not left_panel:
     render_left()
     render_right()
+
