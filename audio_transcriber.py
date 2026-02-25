@@ -132,24 +132,48 @@ Powered By Faster-Whisper • Streamlit Cloud
 # PAYPAL API
 # =========================
 
+# =========================
+# PAYPAL API (SAFE VERSION)
+# =========================
+
 def paypal_token():
 
-    url="https://api-m.paypal.com/v1/oauth2/token"
+    try:
 
-    r=requests.post(
-        url,
-        headers={
-            "Accept":"application/json",
-            "Accept-Language":"en_US"
-        },
-        data={"grant_type":"client_credentials"},
-        auth=(
-            st.secrets["PAYPAL_CLIENT_ID"],
-            st.secrets["PAYPAL_SECRET"]
+        url="https://api-m.paypal.com/v1/oauth2/token"
+
+        r=requests.post(
+            url,
+            headers={
+                "Accept":"application/json",
+                "Accept-Language":"en_US"
+            },
+            data={"grant_type":"client_credentials"},
+            auth=(
+                st.secrets["PAYPAL_CLIENT_ID"],
+                st.secrets["PAYPAL_SECRET"]
+            )
         )
-    )
 
-    return r.json()["access_token"]
+        data=r.json()
+
+        if "access_token" in data:
+
+            return data["access_token"]
+
+        else:
+
+            st.error("PayPal authentication failed.")
+            st.write(data)
+
+            return None
+
+    except Exception as e:
+
+        st.error("PayPal connection error")
+        st.write(e)
+
+        return None
 
 
 
@@ -157,26 +181,33 @@ def verify_payment(txn):
 
     token=paypal_token()
 
-    url=f"https://api-m.paypal.com/v2/checkout/orders/{txn}"
+    if token is None:
+        return False
 
-    r=requests.get(
-        url,
-        headers={
-            "Authorization":f"Bearer {token}"
-        }
-    )
+    try:
 
-    if r.status_code==200:
+        url=f"https://api-m.paypal.com/v2/checkout/orders/{txn}"
 
-        data=r.json()
+        r=requests.get(
+            url,
+            headers={
+                "Authorization":f"Bearer {token}"
+            }
+        )
 
-        if data["status"]=="COMPLETED":
+        if r.status_code==200:
 
-            return True
+            data=r.json()
+
+            if data.get("status")=="COMPLETED":
+
+                return True
+
+    except Exception as e:
+
+        st.write(e)
 
     return False
-
-
 
 # =========================
 # WHISPER MODEL
@@ -407,3 +438,4 @@ Adsense Ready
             st.write(h)
 
         st.markdown("</div>",unsafe_allow_html=True)
+
