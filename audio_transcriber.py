@@ -36,10 +36,7 @@ def save_users(data):
     with open(USER_DB,"w") as f:
         json.dump(data,f)
 
-
-
 users=load_users()
-
 
 
 # ======================
@@ -59,7 +56,6 @@ if "history" not in st.session_state:
     st.session_state.history=[]
 
 
-
 # ======================
 # PLAN
 # ======================
@@ -73,7 +69,6 @@ else:
 
     allowed_models=["tiny","base"]
     MAX_MB=25
-
 
 
 # ======================
@@ -122,7 +117,6 @@ font-size:12px;
 """,unsafe_allow_html=True)
 
 
-
 # ======================
 # HEADER
 # ======================
@@ -144,7 +138,6 @@ st.markdown(f"""
 """,unsafe_allow_html=True)
 
 
-
 # ======================
 # PAYPAL VERIFY
 # ======================
@@ -155,9 +148,7 @@ def paypal_token():
 
         r=requests.post(
         "https://api-m.paypal.com/v1/oauth2/token",
-        headers={
-        "Accept":"application/json"
-        },
+        headers={"Accept":"application/json"},
         data={"grant_type":"client_credentials"},
         auth=(
         st.secrets["PAYPAL_CLIENT_ID"],
@@ -166,12 +157,10 @@ def paypal_token():
         )
 
         data=r.json()
-
         return data.get("access_token")
 
     except:
         return None
-
 
 
 def verify_payment(txn):
@@ -191,7 +180,6 @@ def verify_payment(txn):
         if r.status_code==200:
 
             if r.json().get("status")=="COMPLETED":
-
                 return True
 
     except:
@@ -200,15 +188,77 @@ def verify_payment(txn):
     return False
 
 
-
 # ======================
 # PASSWORD GENERATOR
 # ======================
 
 def temp_password():
-
     return ''.join(random.choices(string.ascii_letters+string.digits,k=8))
 
+
+# ======================
+# SUBTITLE FORMATTERS
+# ======================
+
+def format_timestamp(seconds):
+    h=int(seconds//3600)
+    m=int((seconds%3600)//60)
+    s=seconds%60
+    return f"{h:02}:{m:02}:{s:06.3f}".replace(".",",")
+
+
+def generate_srt(segments):
+
+    lines=[]
+    for i,seg in enumerate(segments,1):
+
+        start=format_timestamp(seg.start)
+        end=format_timestamp(seg.end)
+
+        lines.append(f"{i}")
+        lines.append(f"{start} --> {end}")
+        lines.append(seg.text.strip())
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def generate_lrc(segments):
+
+    lines=[]
+    for seg in segments:
+
+        m=int(seg.start//60)
+        s=seg.start%60
+
+        lines.append(f"[{m:02}:{s:05.2f}]{seg.text.strip()}")
+
+    return "\n".join(lines)
+
+
+def generate_ass(segments):
+
+    header="""[Script Info]
+ScriptType: v4.00+
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, Alignment
+Style: Default,Arial,20,&H00FFFFFF,2
+
+[Events]
+Format: Layer, Start, End, Style, Text
+"""
+
+    lines=[header]
+
+    for seg in segments:
+
+        start=format_timestamp(seg.start).replace(",",".")
+        end=format_timestamp(seg.end).replace(",", ".")
+
+        lines.append(f"Dialogue: 0,{start},{end},Default,{seg.text.strip()}")
+
+    return "\n".join(lines)
 
 
 # ======================
@@ -217,6 +267,7 @@ def temp_password():
 
 left,center,right=st.columns([1,3,1])
 
+
 # ======================
 # LEFT PANEL
 # ======================
@@ -224,7 +275,6 @@ left,center,right=st.columns([1,3,1])
 with left:
 
     st.markdown("<div class='card'>",unsafe_allow_html=True)
-
     st.subheader("Account")
 
     if st.session_state.user:
@@ -232,7 +282,6 @@ with left:
         st.write("Logged as:",st.session_state.user)
 
         if st.button("Logout"):
-
             st.session_state.user=None
             st.session_state.premium=False
             st.rerun()
@@ -240,7 +289,6 @@ with left:
     else:
 
         login_email=st.text_input("Email")
-
         login_pass=st.text_input("Password",type="password")
 
         if st.button("Login"):
@@ -260,32 +308,24 @@ with left:
     st.markdown("</div>",unsafe_allow_html=True)
 
 
-
     if not st.session_state.premium:
 
         st.markdown("""
 <div class="card">
-
 <h4>Upgrade Premium</h4>
-
 Unlimited Subtitles<br>
 Long Audio<br>
 Better Models
-
 </div>
 """,unsafe_allow_html=True)
-
 
         st.link_button(
         "Pay ₱699",
         "https://paypal.me/DonnaldBariso791/699"
         )
 
-
         email=st.text_input("Email for Premium")
-
         txn=st.text_input("Transaction ID")
-
 
         if st.button("Verify Payment"):
 
@@ -294,34 +334,27 @@ Better Models
                 password=temp_password()
 
                 users[email]={
-
                 "password":password,
                 "premium":True
-
                 }
 
                 save_users(users)
 
                 st.success("Account Created")
-
                 st.write("Email:",email)
                 st.write("Temp Password:",password)
 
             else:
-
                 st.error("Payment not verified")
-
 
 
     st.markdown(f"""
 <div class="card">
-
 Usage:
-
 {st.session_state.usage}/{FREE_LIMIT}
-
 </div>
 """,unsafe_allow_html=True)
+
 
 # ======================
 # CENTER
@@ -329,78 +362,89 @@ Usage:
 
 with center:
 
-
     uploaded_file=st.file_uploader(
     "Upload Audio",
     type=["mp3","wav","m4a","mp4"]
     )
 
-
     if uploaded_file:
-
 
         size=uploaded_file.size/1024/1024
 
         if size>MAX_MB:
-
             st.error("File too large")
             st.stop()
 
-
         st.audio(uploaded_file)
 
-
         if not st.session_state.premium:
-
             if st.session_state.usage>=FREE_LIMIT:
-
                 st.error("Free limit reached")
                 st.stop()
-
 
         model_size=st.selectbox(
         "Whisper Model",
         allowed_models
         )
 
-
         @st.cache_resource
         def load_model(size):
-
             return WhisperModel(size,compute_type="int8")
 
-
         model=load_model(model_size)
-
 
         if st.button("Generate Subtitles"):
 
             with tempfile.NamedTemporaryFile(delete=False) as tmp:
-
                 tmp.write(uploaded_file.read())
                 path=tmp.name
 
-
             segments,_=model.transcribe(path)
-
             segments=list(segments)
 
-
             st.session_state.usage+=1
-
 
             for seg in segments:
 
                 st.markdown(f"""
-
 <div class="subtitle-card">
-
 {seg.text}
-
 </div>
-
 """,unsafe_allow_html=True)
 
+
+            # ======================
+            # DOWNLOAD SUBTITLES
+            # ======================
+
+            srt_file=generate_srt(segments)
+            lrc_file=generate_lrc(segments)
+            ass_file=generate_ass(segments)
+
+            st.markdown("### Download Subtitles")
+
+            col1,col2,col3=st.columns(3)
+
+            with col1:
+                st.download_button(
+                    "Download SRT",
+                    srt_file,
+                    file_name="subtitles.srt"
+                )
+
+            with col2:
+                st.download_button(
+                    "Download LRC",
+                    lrc_file,
+                    file_name="subtitles.lrc"
+                )
+
+            with col3:
+                st.download_button(
+                    "Download ASS",
+                    ass_file,
+                    file_name="subtitles.ass"
+                )
 
 
 # ======================
@@ -409,32 +453,20 @@ with center:
 
 with right:
 
-    # Sponsored Card
     st.markdown("""
 <div class="card">
-
 <h4>🤝 Sponsored</h4>
-
 Advertise your service here.
-
 </div>
 """,unsafe_allow_html=True)
 
-
-
-    # Adsense Card
     st.markdown("""
 <div class="card">
-
 <h4>📢 Advertisement</h4>
-
 </div>
 """,unsafe_allow_html=True)
-
-
 
     components.html("""
-
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4128082001934890"
 crossorigin="anonymous"></script>
 
@@ -448,5 +480,4 @@ data-full-width-responsive="true"></ins>
 <script>
 (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-
-""", height=350)
+""",height=350)
